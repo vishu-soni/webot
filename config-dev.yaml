@@ -1,0 +1,20 @@
+env:
+  sancharport: 9000
+  adminport: 9001
+  testport: 8000
+logger:
+    dir: "/var/log/webot"
+    file: "webot.log"
+    level: info
+sentry:
+    enabled: false
+    dsn: http://defb57f7252e46e4a8db76b80989b2b3@sentry.wheelseye.in/66
+postgres:
+  user: sancharuser
+  password: sanchar1234
+  address: 10.10.84.23:5432
+  db: sancharv2
+  poolsize: 10
+  table:
+    ChatUsers: chat_users
+    ChatHistory: chat_history

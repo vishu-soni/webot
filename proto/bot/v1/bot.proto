@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+option go_package = "proto/bot/v1";
+package proto.bot.v1;
+
+service ChatService {
+    rpc getResponse(queryRequest) returns (queryResponse) {}
+    rpc JoinChannel(Channel) returns (stream Message) {}
+    rpc SendMessage(stream Message) returns (MessageAck) {}
+    rpc ChitChat(stream Chit) returns (Chat){}
+}
+
+message Channel {
+    string user_code = 1;
+    string user_type = 2;
+    bool status = 3;
+    string query_context = 4;
+}
+
+message Message {
+    string sender = 1;
+    string sender_type = 2;
+    string session_id = 3;
+    Channel channel = 4;
+    string message = 5;
+}
+
+message Chit {
+    string sender = 1;
+    string sender_type = 2;
+    string session_id = 3;
+    Channel channel = 4;
+    string message = 5;
+    string receiver = 6;
+    repeated string chat_context = 7;
+}
+
+message Chat {
+    string status = 1;
+}
+
+message MessageAck {
+    string status = 1;
+}
+
+message queryRequest {
+    string user_code = 1;
+    string user_query = 2;
+}
+
+message queryResponse {
+    repeated string statement = 1;
+}

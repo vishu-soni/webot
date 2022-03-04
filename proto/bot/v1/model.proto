@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package = "proto/bot/v1";
+package proto.bot.v1;
+
+message ChatHistory {
+    string send_from = 1;
+    string channel_name = 2;
+    string message = 3;
+    string sent_time = 4;
+    string sent_to = 5;
+}
+
+message ChatUsers {
+    string user_code = 1;
+    string user_type = 2;
+    bool status = 3;
+    bool channels = 4;
+}
