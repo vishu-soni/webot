@@ -23,7 +23,7 @@ var (
 func init() {
 	flag.Parse()
 	setDefaults()
-	viper.AddConfigPath("$GOPATH/src/webot")
+	viper.AddConfigPath("$GOPATH/src/sanchar")
 	viper.AddConfigPath(".")
 	viper.SetConfigType("yaml")
 	viper.AutomaticEnv()

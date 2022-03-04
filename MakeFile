@@ -1,0 +1,64 @@
+GOPATH:=$(shell go env GOPATH)
+GOPRIVATE=github.com/WeyeTech/*,github.com/weyetech/*
+.PHONY: test build proto help
+
+VERSION ?= $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || echo v0)
+
+# golang variables
+GO           ?= go
+GOFMT        ?= $(GO)fmt
+GOHOSTOS     ?= $(shell $(GO) env GOHOSTOS)
+GOHOSTARCH   ?= $(shell $(GO) env GOHOSTARCH)
+
+GO_VERSION        ?= $(shell $(GO) version)
+GO_VERSION_NUMBER ?= $(word 3, $(GO_VERSION))
+PRE_GO_111        ?= $(shell echo $(GO_VERSION_NUMBER) | grep -E 'go1\.(10|[0-9])\.')
+
+GO111MODULE :=
+ifeq (, $(PRE_GO_111))
+	ifneq (,$(wildcard go.mod))
+		GO111MODULE := on
+	endif
+endif
+
+# runtime variables
+GCTRACE 	?= 1
+GINMODE 	?= release
+GINMODE 	?= debug
+
+# executable path
+BINARY ?= bin/webot
+APP ?= app/*.go
+
+# pre runtime/compile time measures
+predo:
+	@echo $(GOGC)
+
+	@echo "Formatting code (updating source file directly instead of displaying results in stdout)"
+	GO111MODULE=$(GO111MODULE) $(GOFMT) -w -l .
+	@echo "Examining code"
+	GO111MODULE=$(GO111MODULE) $(GO) vet  ./...
+ifdef GO111MODULE
+	GO111MODULE=$(GO111MODULE) $(GO) mod download
+endif
+
+proto:
+	@echo "Generating Go code from proto files"
+	protoc --plugin=grpc:proto --go-grpc_out=. --go_out=. --go_opt=paths=source_relative  proto/bot/v1/*.proto
+
+build:
+	@echo "Building binary"
+	GOPRIVATE=${GOPRIVATE} go build -o $(BINARY) $(APP)
+
+dev: predo build
+	@echo "Running application in development environment"
+	$(BINARY) --env=dev &
+
+
+help:
+	@echo  'The One Service to Connect With Everyone'
+	@echo  '  help        		- Show this help'
+	@echo  '  build		       	- Build the binary executable'
+	@echo  '  dev		       	- Run in development environment. '
+	@echo  '  stage		       	- Run in stage application'
+	@echo  ''

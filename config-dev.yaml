@@ -1,7 +1,3 @@
-env:
-  sancharport: 9000
-  adminport: 9001
-  testport: 8000
 logger:
     dir: "/var/log/webot"
     file: "webot.log"
