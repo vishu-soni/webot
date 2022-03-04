@@ -19,6 +19,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -65,5 +66,6 @@ func main() {
 	grpcServer := grpc.NewServer(opts...)
 	serv := botService.New(agentSessionRepo, agentRepo, chatHistoryRepo, opSessionRepo)
 	botpb.RegisterChatServiceServer(grpcServer, serv)
+	reflection.Register(grpcServer)
 	grpcServer.Serve(lis)
 }
