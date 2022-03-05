@@ -51,13 +51,17 @@ func (s *chatServiceServer) getRandomAgent() string {
 	return mapKeys[rand.Intn(len(mapKeys))]
 }
 
-
-
-
 func (s *chatServiceServer) JoinChannel(ch *botpb.Channel, msgStream botpb.ChatService_JoinChannelServer) error {
+	invite := botpb.Message{}
+	invite.Sender = ch.GetUserCode()
+	invite.Message = "wait"
+	invite.Channel = ch
+	invite.SenderType = ch.GetUserType()
+
 	ctx := context.Background()
 	var randomAgent string
 	msgChannel := make(chan *botpb.Message)
+	msgStream.Send(&invite)
 	if ch.UserType == "OPERATOR" {
 		s.activeUsers[ch.UserCode] = msgChannel
 		randomAgent = s.getRandomAgent()
