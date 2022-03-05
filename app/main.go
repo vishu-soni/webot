@@ -57,7 +57,7 @@ func main() {
 	}
 
 	fmt.Println("--- SERVER APP ---")
-	lis, err := net.Listen("tcp", "localhost:10002")
+	lis, err := net.Listen("tcp", ":10002")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
