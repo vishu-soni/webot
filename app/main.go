@@ -58,7 +58,7 @@ func main() {
 	botpb.RegisterServiceServer(Server, handler)
 	reflection.Register(Server)
 
-	lis, err := net.Listen("tcp", ":9002")
+	lis, err := net.Listen("tcp", ":9901")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
