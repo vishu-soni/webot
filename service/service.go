@@ -32,6 +32,7 @@ func New() *handler {
 }
 
 func (h *handler) Chit(ctx context.Context, req *botpb.ChitRequest) (*botpb.ChitResponse, error) {
+	log.Infof("chit:user-%s msg-%s", req.GetUserCode(), req.GetMessage())
 	h.messages <- message{
 		UserCode: req.GetUserCode(),
 		Body:     req.GetMessage(),
