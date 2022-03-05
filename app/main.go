@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net"
 	"time"
 	"webot/config"
@@ -56,7 +55,7 @@ func main() {
 		log.Panicf("main::error creating repo err=%+v", err)
 	}
 
-	fmt.Println("--- SERVER APP ---")
+
 	lis, err := net.Listen("tcp", ":10002")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)

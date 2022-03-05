@@ -2,7 +2,6 @@ package userdata
 
 import (
 	"context"
-	"fmt"
 	"time"
 	model "webot/proto/bot/v1"
 	store "webot/store"
@@ -75,7 +74,7 @@ func (d *Data) DropChatUserStatus(ctx context.Context, userCode string) error {
 }
 
 func (d *Data) UpdateChannelCount(ctx context.Context, userCode string, n int) (int, error) {
-	fmt.Printf("userChannels are %v\n", n)
+
 	agentLiveData := new(ChatUserData)
 	err := d.client.Model(agentLiveData).Where("agent_code = ?", userCode).Select()
 	if err != nil {
