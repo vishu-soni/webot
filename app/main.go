@@ -3,19 +3,11 @@ package main
 import (
 	"net"
 	"time"
-	"webot/config"
-	botService "webot/grpc"
-	"webot/logger"
-	"webot/logger/hooks/sentryhook"
+	logger "webot/logger"
+	sentryhook "webot/logger/hooks/sentryhook"
 	botpb "webot/proto/bot/v1"
 	sentry "webot/sentry"
-	agentdata "webot/store/postgres/agentdata"
-	agentsessiondata "webot/store/postgres/agentsession"
-	categorydata "webot/store/postgres/category"
-	chathistorydata "webot/store/postgres/chathistory"
-	opsessiondata "webot/store/postgres/opsession"
-
-	"webot/store/postgres"
+	service "webot/service"
 
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -31,45 +23,45 @@ func main() {
 		log.Info("main::sentry init success")
 	}
 
-	postgresClient, err := postgres.NewClient(config.Postgres())
-	if err != nil {
-		log.Panicf("main::error creating postgres client err=%+v", err)
-	}
+	// postgresClient, err := postgres.NewClient(config.Postgres())
+	// if err != nil {
+	// 	log.Panicf("main::error creating postgres client err=%+v", err)
+	// }
 
-	agentRepo, err := agentdata.New(postgresClient)
-	if err != nil {
-		log.Panicf("main::error creating repo err=%+v", err)
-	}
+	// agentRepo, err := agentdata.New(postgresClient)
+	// if err != nil {
+	// 	log.Panicf("main::error creating repo err=%+v", err)
+	// }
 
-	agentSessionRepo, err := agentsessiondata.New(postgresClient)
-	if err != nil {
-		log.Panicf("main::error creating repo err=%+v", err)
-	}
+	// agentSessionRepo, err := agentsessiondata.New(postgresClient)
+	// if err != nil {
+	// 	log.Panicf("main::error creating repo err=%+v", err)
+	// }
 
-	chatHistoryRepo, err := chathistorydata.New(postgresClient)
-	if err != nil {
-		log.Panicf("main::error creating repo err=%+v", err)
-	}
+	// chatHistoryRepo, err := chathistorydata.New(postgresClient)
+	// if err != nil {
+	// 	log.Panicf("main::error creating repo err=%+v", err)
+	// }
 
-	opSessionRepo, err := opsessiondata.New(postgresClient)
-	if err != nil {
-		log.Panicf("main::error creating repo err=%+v", err)
-	}
+	// opSessionRepo, err := opsessiondata.New(postgresClient)
+	// if err != nil {
+	// 	log.Panicf("main::error creating repo err=%+v", err)
+	// }
 
-	categoryRepo, err := categorydata.New(postgresClient)
-	if err != nil {
-		log.Panicf("main::error creating repo err=%+v", err)
-	}
+	// categoryRepo, err := categorydata.New(postgresClient)
+	// if err != nil {
+	// 	log.Panicf("main::error creating repo err=%+v", err)
+	// }
 
-	lis, err := net.Listen("tcp", ":10002")
+	handler := service.New()
+	Server := grpc.NewServer()
+	botpb.RegisterServiceServer(Server, handler)
+	reflection.Register(Server)
+
+	lis, err := net.Listen("tcp", ":9002")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
+	Server.Serve(lis)
 
-	var opts []grpc.ServerOption
-	grpcServer := grpc.NewServer(opts...)
-	serv := botService.New(agentSessionRepo, agentRepo, chatHistoryRepo, opSessionRepo, categoryRepo)
-	botpb.RegisterChatServiceServer(grpcServer, serv)
-	reflection.Register(grpcServer)
-	grpcServer.Serve(lis)
 }

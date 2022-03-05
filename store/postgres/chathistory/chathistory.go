@@ -38,5 +38,6 @@ func New(client *postgres.Client) (store.ChatRepo, error) {
 
 // QueryByTemplateName gives values for a specific template
 func (d *Data) QueryByUserCodeAndType(ctx context.Context, userCode string, userType string) (*model.ChatUsers, error) {
+	
 	return nil, nil
 }

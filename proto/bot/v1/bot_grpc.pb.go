@@ -25,7 +25,6 @@ type ChatServiceClient interface {
 	GetResponse(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (*QueryResponse, error)
 	JoinChannel(ctx context.Context, in *Channel, opts ...grpc.CallOption) (ChatService_JoinChannelClient, error)
 	SendMessage(ctx context.Context, opts ...grpc.CallOption) (ChatService_SendMessageClient, error)
-	ChitChat(ctx context.Context, opts ...grpc.CallOption) (ChatService_ChitChatClient, error)
 }
 
 type chatServiceClient struct {
@@ -111,40 +110,6 @@ func (x *chatServiceSendMessageClient) CloseAndRecv() (*MessageAck, error) {
 	return m, nil
 }
 
-func (c *chatServiceClient) ChitChat(ctx context.Context, opts ...grpc.CallOption) (ChatService_ChitChatClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ChatService_ServiceDesc.Streams[2], "/proto.bot.v1.ChatService/ChitChat", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &chatServiceChitChatClient{stream}
-	return x, nil
-}
-
-type ChatService_ChitChatClient interface {
-	Send(*Chit) error
-	CloseAndRecv() (*Chat, error)
-	grpc.ClientStream
-}
-
-type chatServiceChitChatClient struct {
-	grpc.ClientStream
-}
-
-func (x *chatServiceChitChatClient) Send(m *Chit) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *chatServiceChitChatClient) CloseAndRecv() (*Chat, error) {
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	m := new(Chat)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 // ChatServiceServer is the server API for ChatService service.
 // All implementations must embed UnimplementedChatServiceServer
 // for forward compatibility
@@ -152,7 +117,6 @@ type ChatServiceServer interface {
 	GetResponse(context.Context, *QueryRequest) (*QueryResponse, error)
 	JoinChannel(*Channel, ChatService_JoinChannelServer) error
 	SendMessage(ChatService_SendMessageServer) error
-	ChitChat(ChatService_ChitChatServer) error
 	mustEmbedUnimplementedChatServiceServer()
 }
 
@@ -168,9 +132,6 @@ func (UnimplementedChatServiceServer) JoinChannel(*Channel, ChatService_JoinChan
 }
 func (UnimplementedChatServiceServer) SendMessage(ChatService_SendMessageServer) error {
 	return status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
-}
-func (UnimplementedChatServiceServer) ChitChat(ChatService_ChitChatServer) error {
-	return status.Errorf(codes.Unimplemented, "method ChitChat not implemented")
 }
 func (UnimplementedChatServiceServer) mustEmbedUnimplementedChatServiceServer() {}
 
@@ -250,32 +211,6 @@ func (x *chatServiceSendMessageServer) Recv() (*Message, error) {
 	return m, nil
 }
 
-func _ChatService_ChitChat_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ChatServiceServer).ChitChat(&chatServiceChitChatServer{stream})
-}
-
-type ChatService_ChitChatServer interface {
-	SendAndClose(*Chat) error
-	Recv() (*Chit, error)
-	grpc.ServerStream
-}
-
-type chatServiceChitChatServer struct {
-	grpc.ServerStream
-}
-
-func (x *chatServiceChitChatServer) SendAndClose(m *Chat) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *chatServiceChitChatServer) Recv() (*Chit, error) {
-	m := new(Chit)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 // ChatService_ServiceDesc is the grpc.ServiceDesc for ChatService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -297,11 +232,6 @@ var ChatService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "SendMessage",
 			Handler:       _ChatService_SendMessage_Handler,
-			ClientStreams: true,
-		},
-		{
-			StreamName:    "ChitChat",
-			Handler:       _ChatService_ChitChat_Handler,
 			ClientStreams: true,
 		},
 	},

@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option go_package = "proto/bot/v1";
+package proto.bot.v1;
+
+service Service {
+    rpc Chit(ChitRequest) returns (ChitResponse){}
+    rpc Chat(ChatRequest) returns (stream ChatResponse){} 
+    rpc InitiateChat(InitiateChatRequest) returns (IntiateChatResponse){}
+}
+
+message ChitRequest{
+    string user_code = 1;
+    string message = 2;
+}
+message ChitResponse{
+    string response = 1;
+}
+message ChatRequest{
+    string user_code = 1;
+}
+message ChatResponse{
+    string message = 1;
+}
+message InitiateChatRequest{
+    string agent = 1;
+    string user = 2;
+}
+message IntiateChatResponse{
+    string response = 1;
+}

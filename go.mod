@@ -7,6 +7,7 @@ require (
 	github.com/go-pg/pg/v9 v9.2.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.10.1
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.27.1
 )
