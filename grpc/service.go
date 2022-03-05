@@ -17,9 +17,10 @@ type chatServiceServer struct {
 	agentRepo        store.AgentRepo
 	agentSessionRepo store.AgentSessionRepo
 	opSessionRepo    store.OpSessionRepo
+	categoryRepo     store.CategoryRepo
 }
 
-func New(agentSessionRepo store.AgentSessionRepo, agentRepo store.AgentRepo, chatRepo store.ChatRepo, opSessionRepo store.OpSessionRepo) *chatServiceServer {
+func New(agentSessionRepo store.AgentSessionRepo, agentRepo store.AgentRepo, chatRepo store.ChatRepo, opSessionRepo store.OpSessionRepo, categoryRepo store.CategoryRepo) *chatServiceServer {
 	s := &chatServiceServer{
 		UnimplementedChatServiceServer: botpb.UnimplementedChatServiceServer{},
 		channel:                        map[string][]chan *botpb.Message{},
@@ -29,6 +30,7 @@ func New(agentSessionRepo store.AgentSessionRepo, agentRepo store.AgentRepo, cha
 		agentRepo:                      agentRepo,
 		agentSessionRepo:               agentSessionRepo,
 		opSessionRepo:                  opSessionRepo,
+		categoryRepo:                   categoryRepo,
 	}
 	return s
 }
@@ -40,6 +42,21 @@ func (s *chatServiceServer) RemoveChannel(channelSlice []chan *botpb.Message, ch
 		}
 	}
 	return channelSlice
+}
+
+func (s *chatServiceServer) GetResponse(ctx context.Context, in *botpb.QueryRequest) (*botpb.QueryResponse, error) {
+	res, err := s.categoryRepo.GetQueryResponse(ctx, in.UserQuery)
+	if err != nil {
+		return &botpb.QueryResponse{
+			Statement: []string{},
+		}, nil
+	}
+
+	response := botpb.QueryResponse{
+		Statement: res,
+	}
+
+	return &response, nil
 }
 
 func (s *chatServiceServer) getRandomAgent() string {

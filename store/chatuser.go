@@ -24,3 +24,7 @@ type OpSessionRepo interface {
 	SaveOperatorSession(ctx context.Context, opCode string , agent string ) error
 	UpdateOperatorSession(ctx context.Context, opCode string , agent string ) error
 }
+
+type CategoryRepo interface {
+	GetQueryResponse(ctx context.Context, query string) ([]string,error)
+}

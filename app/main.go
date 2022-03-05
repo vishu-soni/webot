@@ -11,6 +11,7 @@ import (
 	sentry "webot/sentry"
 	agentdata "webot/store/postgres/agentdata"
 	agentsessiondata "webot/store/postgres/agentsession"
+	categorydata "webot/store/postgres/category"
 	chathistorydata "webot/store/postgres/chathistory"
 	opsessiondata "webot/store/postgres/opsession"
 
@@ -55,6 +56,10 @@ func main() {
 		log.Panicf("main::error creating repo err=%+v", err)
 	}
 
+	categoryRepo, err := categorydata.New(postgresClient)
+	if err != nil {
+		log.Panicf("main::error creating repo err=%+v", err)
+	}
 
 	lis, err := net.Listen("tcp", ":10002")
 	if err != nil {
@@ -63,7 +68,7 @@ func main() {
 
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
-	serv := botService.New(agentSessionRepo, agentRepo, chatHistoryRepo, opSessionRepo)
+	serv := botService.New(agentSessionRepo, agentRepo, chatHistoryRepo, opSessionRepo, categoryRepo)
 	botpb.RegisterChatServiceServer(grpcServer, serv)
 	reflection.Register(grpcServer)
 	grpcServer.Serve(lis)
